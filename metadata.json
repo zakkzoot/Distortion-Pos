@@ -1,0 +1,5 @@
+{
+  "name": "KhmerBar POS",
+  "description": "A Google-integrated POS system for Cambodian bars featuring ABA payments, inventory management with cocktail recipes, and Gemini AI insights.",
+  "requestFramePermissions": []
+}
