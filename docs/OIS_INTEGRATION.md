@@ -27,31 +27,39 @@ So the badge identifies the box, and the box is a generic Windows 10 PC. That
 matters for two reasons: it tells us almost nothing about the software, and it
 means **this POS runs on the existing terminal with no new hardware**.
 
-### Which software is probably on it
+### Which software is on it
 
-The software is whatever the reseller installed. Ranked by likelihood given who
-sells this hardware:
+**Owner's report, 2026-11-13: the till runs "OnecamboPOS" in a web-based
+interface.** So the incumbent is a browser POS hosted by a vendor, not a
+Windows program with a local database. The reseller guesses made before this
+was known (POS Cambodia, BPOS) are dropped.
 
-1. **POS Cambodia's own POS** (`poscambodia.com`). They sell the 607 series and
-   their own restaurant POS with table management and ingredient-based stock.
-2. **BPOS** (`bposcambodia.com`). They list the same Poswell models and sell a
-   food-and-drink POS (tables, split and merge bills, sales and profit reports).
-3. **Another locally installed Windows POS** from a different reseller or a
-   freelancer. Common in Phnom Penh, usually a desktop app on a local database.
-4. **A browser or cloud POS** (Loyverse and similar) running in Chrome on the box.
+No product is published under exactly that name. Two real Cambodian products
+are close, and the address bar on the till tells them apart:
 
-*Not verified.* The reseller pages were read as search snippets only, and
-nobody has looked at the terminal.
+| Candidate | Evidence | Fit |
+|---|---|---|
+| **eOcambo POS Online** (`pos.eocambo.com`) | A live web login page titled "eOcambo POS Online" with username, password, "Remember Me", "Forgot Your Password" and staff clock-in / clock-out. "eOcambo" reads as "Onecambo" at a glance. eOcambo sells packaged business systems in Cambodia. | Strongest: it is web-based and the name is one letter-swap away. |
+| **CamboPOS** (`cambopos.com`) | Sells a POS for "restaurant, cafe, bar, club and KTV" with a Khmer interface, a "Web Report" module for sales and stock reports from any device, and "various data export". | Possible, but its till is described as an installed program with web reporting on top, which fits "web-based interface" less well. |
+
+*Not verified.* Both are from search snippets; neither site could be opened from
+the build environment, and no login was attempted. The exact product name on the
+screen and the URL have not been seen.
+
+*Inference, to check:* the eOcambo login page (clock-in on the login screen, the
+exact wording of its links) matches the layout of Ultimate POS, a widely resold
+web POS. If that is what it is, every report screen has Excel / CSV / PDF export
+buttons and the vendor can switch on a REST API module. Confirm with the vendor
+before relying on it.
 
 ### How to settle it in two minutes at the bar
 
-1. Read the software name off the login screen or window title bar, and the
-   name printed in small type at the bottom of a receipt.
+1. Read the web address in the browser's address bar and the exact name on the
+   login screen. That alone decides between the candidates above.
 2. Look for a reseller sticker on the back or base of the terminal (name and
    phone number). That is the vendor to ask for an export.
-3. In Windows: Settings → Apps, and look for the POS and for a database engine
-   (SQL Server, MySQL, PostgreSQL, Firebird). A database engine means a full
-   local history exists.
+3. Check whether the till still takes orders with the Wi-Fi off. A hosted web
+   POS usually does not, which matters in a bar when the internet drops.
 4. In the POS, find the reports menu and note which exports exist (Excel, CSV,
    PDF) and for which reports (sales by item, daily summary).
 
@@ -128,10 +136,17 @@ Usable if the bar stays on its current software. Order of preference:
 
 | Option | How | Trade-off |
 |---|---|---|
-| B1. Report export | Daily "sales by item" export to Excel or CSV from the POS reports menu, uploaded to the Workroom. One CSV adapter per vendor. | Cheapest and inside every vendor's terms. Depends on a person doing it and on what the export contains. This is the route the OIS contract already names for local vendors. |
-| B2. Database read | If the POS keeps a local database, a read-only scheduled query writes the same two files this POS writes. | Complete history, no manual step. Needs the vendor's or owner's agreement and credentials; schema can change on a vendor update. Never write to their database. |
-| B3. Vendor API | Ask the reseller whether an API or scheduled export exists. | Best when it exists. For small local Windows POS products it usually does not. |
+| B1. Report export | Daily "sales by item" export to Excel or CSV from the POS reports screen, uploaded to the Workroom. One CSV adapter per vendor. | Cheapest and inside every vendor's terms, and it works from any browser, including the owner's phone. Depends on a person doing it and on what the export contains. This is the route the OIS contract already names for local vendors. |
+| B2. Vendor API | Ask the vendor whether an API or a scheduled emailed report exists, and for a read-only key in the owner's name. | Best when it exists: no manual step. Credentials go in the OIS secret store, never in a file. |
+| B3. Database read | Not available: a hosted web POS keeps its database on the vendor's server. | Ruled out by the owner's report that the system is web-based. |
 | B4. End-of-day report photo | Staff photograph the Z report into the venue's Telegram bot. | Totals only, no item detail. A fallback when nothing else is possible. |
+
+Do not script a login to the vendor's site to pull reports automatically. OIS
+does not collect from behind someone else's login; the owner exports, or the
+vendor provides an API.
+
+Because the sales history sits on the vendor's server, **export the full history
+before any changeover** and keep the files: access may end with the subscription.
 
 Whichever option is used, the target is the same two-file shape as Path A, so
 OIS needs one adapter contract and Aether one producer.
@@ -165,7 +180,8 @@ the five-point rule at that time.
 
 ## 5. Open questions
 
-- Which software is actually on the terminal (section 1 checklist).
+- The exact product name and web address of the incumbent POS (section 1), and
+  which report exports it offers.
 - The receipt printer's connection (USB with a Windows driver, or LAN) and
   whether the cash drawer hangs off it.
 - Whether the bar charges VAT inside its prices, and the riel rate it uses.
