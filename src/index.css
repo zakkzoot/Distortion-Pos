@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* System fonts only: the till must look right with no internet. */
+@theme {
+  --font-sans: "Segoe UI", "Khmer UI", "Leelawadee UI", "Noto Sans Khmer", system-ui, sans-serif;
+  --font-mono: Consolas, "Cascadia Mono", ui-monospace, monospace;
+}
+
+html, body, #root { height: 100%; }
+body { background: #0c0c0e; color: #f4f4f5; -webkit-tap-highlight-color: transparent; user-select: none; overscroll-behavior: none; }
+input, select, textarea { user-select: text; }
+button { touch-action: manipulation; }
+#print-area { display: none; }
+
+@media print {
+  body { background: #fff; color: #000; }
+  #root > *:not(#print-area) { display: none !important; }
+  #print-area { display: block; font-family: var(--font-mono); font-size: 11px; line-height: 1.25; white-space: pre; margin: 0; }
+  @page { margin: 2mm; }
+}
